@@ -1,7 +1,7 @@
 import React from 'react';
 import { Bell, User } from 'lucide-react';
 
-const TopBar = () => {
+const TopBar = ({ systemState }) => {
   return (
     <div style={{
       height: 'var(--topbar-height)',
@@ -14,10 +14,10 @@ const TopBar = () => {
       backdropFilter: 'var(--glass-blur)'
     }}>
       <div>
-        <h2 style={{ fontSize: '20px', fontWeight: 500 }}>Symphony Arena</h2>
+        <h2 style={{ fontSize: '20px', fontWeight: 500 }}>{systemState?.stadiumName || 'Symphony Arena'}</h2>
         <p style={{ color: 'var(--status-green)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'currentColor', display: 'inline-block' }}></span>
-          System Online • Event Active
+          {systemState?.eventName || 'Event Active'} • System Online
         </p>
       </div>
 

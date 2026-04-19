@@ -5,19 +5,30 @@ import TopBar from './components/TopBar';
 import Dashboard from './pages/Dashboard';
 import VenueMap from './pages/VenueMap';
 import Analytics from './pages/Analytics';
+import EventSetup from './components/EventSetup';
 
 function App() {
-  const [currentView, setCurrentView] = useState('dashboard');
+  const [systemState, setSystemState] = useState(null);
+  const [currentView, setCurrentView] = useState('setup');
+
+  const handleInitialize = (data) => {
+    setSystemState(data);
+    setCurrentView('dashboard');
+  };
+
+  if (currentView === 'setup') {
+    return <EventSetup onInitialize={handleInitialize} />;
+  }
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--bg-primary)' }}>
       <Sidebar currentView={currentView} setCurrentView={setCurrentView} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginLeft: 'var(--sidebar-width)' }}>
-        <TopBar />
+        <TopBar systemState={systemState} />
         <main style={{ padding: '32px', flex: 1, overflowY: 'auto' }}>
-          {currentView === 'dashboard' && <Dashboard />}
-          {currentView === 'map' && <VenueMap />}
-          {currentView === 'analytics' && <Analytics />}
+          {currentView === 'dashboard' && <Dashboard systemState={systemState} />}
+          {currentView === 'map' && <VenueMap systemState={systemState} />}
+          {currentView === 'analytics' && <Analytics systemState={systemState} />}
         </main>
       </div>
     </div>

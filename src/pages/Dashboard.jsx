@@ -37,7 +37,7 @@ const StatCard = ({ title, value, icon, statusColor, subtitle }) => (
   </div>
 );
 
-const Dashboard = () => {
+const Dashboard = ({ systemState }) => {
   const [aiSuggestions, setAiSuggestions] = useState({
     critical: "Predicting critical congestion levels...",
     recommendation: "Analyzing traffic routing...",
@@ -45,18 +45,23 @@ const Dashboard = () => {
   });
   const [loadingAi, setLoadingAi] = useState(true);
 
+  // Fallback data if setup was skipped
+  const stadium = systemState?.stadiumName || "Symphony Arena";
+  const crowdSize = systemState?.tickets || "42500";
+  const traffic = systemState?.trafficLevel || "High";
+
   useEffect(() => {
     async function fetchAIPredictions() {
       try {
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const prompt = `
-          You are 'Gemini AI Sentinel', an advanced stadium management AI for Symphony Arena.
-          Current Status: Expected Crowd (42k), Traffic Congestion (High), Peak entry time (17:30).
-          Respond strictly in JSON format with three short, precise alerts (max 2 sentences each):
+          You are 'Gemini AI Sentinel', an advanced stadium management AI for ${stadium}.
+          Current Status: Expected Crowd (${crowdSize}), Traffic Congestion (${traffic}), Peak entry time nearing.
+          Generate strict JSON format with three precise alerts (max 2 sentences each):
           {
-            "critical": "A high-risk alert regarding a specific gate or area.",
-            "recommendation": "A suggested traffic routing or vehicle diversion.",
-            "staffing": "A suggestion on where to deploy extra security or stewards."
+            "critical": "Provide exact routing instructions for fans from parking to seats avoiding congestion.",
+            "recommendation": "Provide exit strategy to prevent stampedes (e.g. hold section X for 5 mins).",
+            "staffing": "Provide exact steward deployment locations based on the current crowd size."
           }
           Do not include any string wrapper, just raw JSON.
         `;
@@ -69,22 +74,21 @@ const Dashboard = () => {
       } catch (error) {
         console.error("Gemini API Error:", error);
         setAiSuggestions({
-          critical: "Gate 3 congestion predicted to exceed safe threshold in 15 mins. Open auxiliary doors immediately.",
-          recommendation: "Traffic backup on Main St. Suggest routing VIPs through North Entrance via Route B.",
-          staffing: "Deploy 15 additional stewards to Section C based on density clustering."
+          critical: "Direct inbound fans from North Parking to Gate 2 to avoid gridlock. Inform via SMS immediately.",
+          recommendation: "Hold Exit Gates 3 & 4 for 5 minutes post-match to clear the main concourse and prevent stampede risk.",
+          staffing: "Deploy 20 rapid-response stewards to the primary concourse bottleneck."
         });
       } finally {
         setLoadingAi(false);
       }
     }
 
-    // Only run if API key is present
     if (import.meta.env.VITE_GEMINI_API_KEY) {
       fetchAIPredictions();
     } else {
       setLoadingAi(false);
     }
-  }, []);
+  }, [stadium, crowdSize, traffic]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -102,8 +106,8 @@ const Dashboard = () => {
       </div>
 
       <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-        <StatCard title="Expected Crowd" value="42,500" icon={<Users />} statusColor="var(--accent-blue)" subtitle="Including 1,200 VIPs" />
-        <StatCard title="Traffic Congestion" value="High" icon={<Car />} statusColor="var(--status-red)" subtitle="Peak approaching in 45m" />
+        <StatCard title="Expected Crowd" value={Number(crowdSize).toLocaleString()} icon={<Users />} statusColor="var(--accent-blue)" subtitle="Including VIP estimates" />
+        <StatCard title="Traffic Congestion" value={traffic} icon={<Car />} statusColor="var(--status-red)" subtitle="Peak approaching in 45m" />
         <StatCard title="Peak Entry Time" value="17:30" icon={<MapPin />} statusColor="var(--status-yellow)" subtitle="Estimated based on sales" />
         <StatCard title="Active Alerts" value="3" icon={<AlertTriangle />} statusColor="var(--status-red)" subtitle="Requires attention" />
       </div>
