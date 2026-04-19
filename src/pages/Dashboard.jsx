@@ -1,0 +1,188 @@
+import React, { useState, useEffect } from 'react';
+import { Users, Car, MapPin, AlertTriangle, ShieldAlert, Loader2 } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, AreaChart, Area } from 'recharts';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+// Initialize Gemini API
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
+
+const mockCrowdData = [
+  { time: '14:00', density: 10 },
+  { time: '15:00', density: 25 },
+  { time: '16:00', density: 60 },
+  { time: '17:00', density: 85 },
+  { time: '18:00', density: 100 },
+  { time: '19:00', density: 95 },
+  { time: '20:00', density: 40 },
+];
+
+const mockTrafficData = [
+  { time: '14:00', congestion: 20 },
+  { time: '15:00', congestion: 40 },
+  { time: '16:00', congestion: 80 },
+  { time: '17:00', congestion: 95 },
+  { time: '18:00', congestion: 60 },
+  { time: '19:00', congestion: 50 },
+  { time: '20:00', congestion: 30 },
+];
+
+const StatCard = ({ title, value, icon, statusColor, subtitle }) => (
+  <div className="glass-panel" style={{ padding: '24px', flex: '1', minWidth: '220px' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+      <h3 style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>{title}</h3>
+      <div style={{ color: statusColor }}>{icon}</div>
+    </div>
+    <div style={{ fontSize: '32px', fontWeight: 700, marginBottom: '8px' }}>{value}</div>
+    <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{subtitle}</div>
+  </div>
+);
+
+const Dashboard = () => {
+  const [aiSuggestions, setAiSuggestions] = useState({
+    critical: "Predicting critical congestion levels...",
+    recommendation: "Analyzing traffic routing...",
+    staffing: "Calculating optimal staff distribution..."
+  });
+  const [loadingAi, setLoadingAi] = useState(true);
+
+  useEffect(() => {
+    async function fetchAIPredictions() {
+      try {
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const prompt = `
+          You are 'Gemini AI Sentinel', an advanced stadium management AI for Symphony Arena.
+          Current Status: Expected Crowd (42k), Traffic Congestion (High), Peak entry time (17:30).
+          Respond strictly in JSON format with three short, precise alerts (max 2 sentences each):
+          {
+            "critical": "A high-risk alert regarding a specific gate or area.",
+            "recommendation": "A suggested traffic routing or vehicle diversion.",
+            "staffing": "A suggestion on where to deploy extra security or stewards."
+          }
+          Do not include any string wrapper, just raw JSON.
+        `;
+        
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text().replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim();
+        const parsedData = JSON.parse(responseText);
+        
+        setAiSuggestions(parsedData);
+      } catch (error) {
+        console.error("Gemini API Error:", error);
+        setAiSuggestions({
+          critical: "Gate 3 congestion predicted to exceed safe threshold in 15 mins. Open auxiliary doors immediately.",
+          recommendation: "Traffic backup on Main St. Suggest routing VIPs through North Entrance via Route B.",
+          staffing: "Deploy 15 additional stewards to Section C based on density clustering."
+        });
+      } finally {
+        setLoadingAi(false);
+      }
+    }
+
+    // Only run if API key is present
+    if (import.meta.env.VITE_GEMINI_API_KEY) {
+      fetchAIPredictions();
+    } else {
+      setLoadingAi(false);
+    }
+  }, []);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 style={{ fontSize: '28px' }}>Real-Time Event Command</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>AI predictive overview for current event</p>
+        </div>
+        <div className="glass-panel" style={{ padding: '8px 16px', display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>Global Risk Level</span>
+          <div style={{ background: 'var(--status-yellow-bg)', color: 'var(--status-yellow)', padding: '4px 12px', borderRadius: '12px', fontWeight: 600, fontSize: '14px' }}>
+            Elevated
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+        <StatCard title="Expected Crowd" value="42,500" icon={<Users />} statusColor="var(--accent-blue)" subtitle="Including 1,200 VIPs" />
+        <StatCard title="Traffic Congestion" value="High" icon={<Car />} statusColor="var(--status-red)" subtitle="Peak approaching in 45m" />
+        <StatCard title="Peak Entry Time" value="17:30" icon={<MapPin />} statusColor="var(--status-yellow)" subtitle="Estimated based on sales" />
+        <StatCard title="Active Alerts" value="3" icon={<AlertTriangle />} statusColor="var(--status-red)" subtitle="Requires attention" />
+      </div>
+
+      <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+        <div style={{ flex: '2', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div className="glass-panel" style={{ padding: '24px', height: '320px' }}>
+            <h3 style={{ marginBottom: '20px', fontSize: '16px' }}>Predicted Crowd Arrival Density</h3>
+            <ResponsiveContainer width="100%" height="85%">
+              <AreaChart data={mockCrowdData}>
+                <defs>
+                  <linearGradient id="colorDensity" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--accent-blue)" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="var(--accent-blue)" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" vertical={false} />
+                <XAxis dataKey="time" stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                <Tooltip contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '8px' }} />
+                <Area type="monotone" dataKey="density" stroke="var(--accent-blue)" fillOpacity={1} fill="url(#colorDensity)" strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="glass-panel" style={{ padding: '24px', height: '320px' }}>
+            <h3 style={{ marginBottom: '20px', fontSize: '16px' }}>Peripheral Traffic Congestion Prediction</h3>
+            <ResponsiveContainer width="100%" height="85%">
+              <LineChart data={mockTrafficData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" vertical={false} />
+                <XAxis dataKey="time" stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                <Tooltip contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '8px' }} />
+                <Line type="monotone" dataKey="congestion" stroke="var(--status-red)" strokeWidth={3} dot={{ r: 4, fill: 'var(--status-red)' }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div style={{ flex: '1', minWidth: '300px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div className="glass-panel" style={{ padding: '24px', flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+              <div style={{ background: 'rgba(139, 92, 246, 0.2)', padding: '8px', borderRadius: '8px' }}>
+                <ShieldAlert color="var(--accent-purple)" size={20} />
+              </div>
+              <h3 style={{ fontSize: '18px' }}>Gemini AI Sentinel</h3>
+              {loadingAi && <Loader2 size={16} className="animate-spin" color="var(--accent-purple)" style={{ animation: "spin 1s linear infinite" }} />}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ background: 'var(--status-red-bg)', border: '1px solid var(--status-red)', padding: '16px', borderRadius: '8px' }}>
+                <p style={{ color: 'var(--status-red)', fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>CRITICAL ALERT</p>
+                <p style={{ fontSize: '14px' }}>{aiSuggestions.critical}</p>
+                <div style={{ marginTop: '12px', display: 'flex', gap: '10px' }}>
+                  <button style={{ background: 'var(--status-red)', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>Acknowledge</button>
+                  <button style={{ background: 'transparent', color: 'var(--status-red)', border: '1px solid var(--status-red)', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>View CCTV</button>
+                </div>
+              </div>
+
+              <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', padding: '16px', borderRadius: '8px' }}>
+                <p style={{ color: 'var(--accent-blue)', fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>AI RECOMMENDATION</p>
+                <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{aiSuggestions.recommendation}</p>
+              </div>
+
+              <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', padding: '16px', borderRadius: '8px' }}>
+                <p style={{ color: 'var(--accent-blue)', fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>STAFFING SUGGESTION</p>
+                <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{aiSuggestions.staffing}</p>
+              </div>
+            </div>
+            <style>{`
+              @keyframes spin { 100% { transform: rotate(360deg); } }
+              .animate-spin { animation: spin 1s linear infinite; }
+            `}</style>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
