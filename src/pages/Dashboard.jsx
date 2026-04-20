@@ -56,7 +56,7 @@ const Dashboard = ({ systemState }) => {
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const prompt = `
           You are 'Gemini AI Sentinel', an advanced stadium management AI for ${stadium}.
-          Current Status: Expected Crowd (${crowdSize}), Traffic Congestion (${traffic}), Peak entry time nearing.
+          Current Status: Expected Crowd (${crowdSize}), VIPs Present (${systemState?.vips || '0'}), Traffic Congestion (${traffic}), Peak entry time nearing.
           Generate strict JSON format with three precise alerts (max 2 sentences each):
           {
             "critical": "Provide exact routing instructions for fans from parking to seats avoiding congestion.",
@@ -106,7 +106,7 @@ const Dashboard = ({ systemState }) => {
       </div>
 
       <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-        <StatCard title="Expected Crowd" value={Number(crowdSize).toLocaleString()} icon={<Users />} statusColor="var(--accent-blue)" subtitle="Including VIP estimates" />
+        <StatCard title="Expected Crowd" value={Number(crowdSize).toLocaleString()} icon={<Users />} statusColor="var(--accent-blue)" subtitle={`Including ${systemState?.vips || '0'} VIPs expected`} />
         <StatCard title="Traffic Congestion" value={traffic} icon={<Car />} statusColor="var(--status-red)" subtitle="Peak approaching in 45m" />
         <StatCard title="Peak Entry Time" value="17:30" icon={<MapPin />} statusColor="var(--status-yellow)" subtitle="Estimated based on sales" />
         <StatCard title="Active Alerts" value="3" icon={<AlertTriangle />} statusColor="var(--status-red)" subtitle="Requires attention" />
