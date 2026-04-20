@@ -19,32 +19,33 @@ const EventSetup = ({ onInitialize }) => {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div>
-             <label style={{ display: 'block', fontSize: '14px', marginBottom: '8px', color: 'var(--text-secondary)' }}>Sporting Event Name</label>
-             <input type="text" name="eventName" value={formData.eventName} onChange={handleChange} placeholder="e.g. IPL Final 2026" style={{ width: '100%', padding: '12px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff', fontSize: '16px' }} />
+             <label htmlFor="eventName" style={{ display: 'block', fontSize: '14px', marginBottom: '8px', color: 'var(--text-secondary)' }}>Sporting Event Name</label>
+             <input id="eventName" type="text" name="eventName" value={formData.eventName} onChange={handleChange} placeholder="e.g. IPL Final 2026" style={{ width: '100%', padding: '12px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff', fontSize: '16px' }} />
           </div>
           <div>
-             <label style={{ display: 'block', fontSize: '14px', marginBottom: '8px', color: 'var(--text-secondary)' }}>Stadium Name</label>
-             <input type="text" name="stadiumName" value={formData.stadiumName} onChange={handleChange} placeholder="e.g. Wankhede Stadium" style={{ width: '100%', padding: '12px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff', fontSize: '16px' }} />
+             <label htmlFor="stadiumName" style={{ display: 'block', fontSize: '14px', marginBottom: '8px', color: 'var(--text-secondary)' }}>Stadium Name</label>
+             <input id="stadiumName" type="text" name="stadiumName" value={formData.stadiumName} onChange={handleChange} placeholder="e.g. Wankhede Stadium" style={{ width: '100%', padding: '12px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff', fontSize: '16px' }} />
           </div>
           <div style={{ display: 'flex', gap: '16px' }}>
             <div style={{ flex: 1 }}>
-               <label style={{ display: 'block', fontSize: '14px', marginBottom: '8px', color: 'var(--text-secondary)' }}>Expected Crowd Size</label>
-               <input type="number" name="tickets" value={formData.tickets} onChange={handleChange} placeholder="e.g. 85000" style={{ width: '100%', padding: '12px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff', fontSize: '16px' }} />
+               <label htmlFor="tickets" style={{ display: 'block', fontSize: '14px', marginBottom: '8px', color: 'var(--text-secondary)' }}>Expected Crowd Size</label>
+               <input id="tickets" type="number" name="tickets" value={formData.tickets} onChange={handleChange} placeholder="e.g. 85000" style={{ width: '100%', padding: '12px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff', fontSize: '16px' }} />
             </div>
             <div style={{ flex: 1 }}>
-               <label style={{ display: 'block', fontSize: '14px', marginBottom: '8px', color: 'var(--text-secondary)' }}>VIPs Present</label>
-               <input type="number" name="vips" value={formData.vips} onChange={handleChange} placeholder="e.g. 1200" style={{ width: '100%', padding: '12px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff', fontSize: '16px' }} />
+               <label htmlFor="vips" style={{ display: 'block', fontSize: '14px', marginBottom: '8px', color: 'var(--text-secondary)' }}>VIPs Present</label>
+               <input id="vips" type="number" name="vips" value={formData.vips} onChange={handleChange} placeholder="e.g. 1200" style={{ width: '100%', padding: '12px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff', fontSize: '16px' }} />
             </div>
           </div>
           <div>
-             <label style={{ display: 'block', fontSize: '14px', marginBottom: '8px', color: 'var(--text-secondary)' }}>Current Surrounding Traffic Severity</label>
-             <select name="trafficLevel" value={formData.trafficLevel} onChange={handleChange} style={{ width: '100%', padding: '12px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff', fontSize: '16px' }}>
+             <label htmlFor="trafficLevel" style={{ display: 'block', fontSize: '14px', marginBottom: '8px', color: 'var(--text-secondary)' }}>Current Surrounding Traffic Severity</label>
+             <select id="trafficLevel" name="trafficLevel" value={formData.trafficLevel} onChange={handleChange} style={{ width: '100%', padding: '12px 16px', background: 'var(--bg-secondary)', border: '1px solid var(--glass-border)', borderRadius: '8px', color: '#fff', fontSize: '16px' }}>
                <option value="Light">Light Flow</option>
                <option value="Moderate">Moderate Congestion</option>
                <option value="Heavy">Heavy GRIDLOCK</option>
              </select>
           </div>
           <button 
+             aria-label="Launch Command Center"
              onClick={() => onInitialize(formData)}
              disabled={!formData.eventName || !formData.stadiumName || !formData.tickets}
              style={{ 

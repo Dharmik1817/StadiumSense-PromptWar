@@ -22,7 +22,7 @@ const TopBar = ({ systemState }) => {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <button style={{
+        <button aria-label="Notifications" style={{
           background: 'var(--glass-bg)',
           border: '1px solid var(--glass-border)',
           borderRadius: '50%',

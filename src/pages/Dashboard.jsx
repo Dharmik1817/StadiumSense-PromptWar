@@ -162,8 +162,8 @@ const Dashboard = ({ systemState }) => {
                 <p style={{ color: 'var(--status-red)', fontWeight: 600, fontSize: '14px', marginBottom: '4px' }}>CRITICAL ALERT</p>
                 <p style={{ fontSize: '14px' }}>{aiSuggestions.critical}</p>
                 <div style={{ marginTop: '12px', display: 'flex', gap: '10px' }}>
-                  <button style={{ background: 'var(--status-red)', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>Acknowledge</button>
-                  <button style={{ background: 'transparent', color: 'var(--status-red)', border: '1px solid var(--status-red)', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>View CCTV</button>
+                  <button type="button" aria-label="Acknowledge critical alert" style={{ background: 'var(--status-red)', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>Acknowledge</button>
+                  <button type="button" aria-label="View CCTV for critical alert" style={{ background: 'transparent', color: 'var(--status-red)', border: '1px solid var(--status-red)', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}>View CCTV</button>
                 </div>
               </div>
 
