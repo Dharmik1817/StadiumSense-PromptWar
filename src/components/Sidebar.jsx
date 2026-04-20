@@ -9,7 +9,7 @@ const Sidebar = ({ currentView, setCurrentView }) => {
   ];
 
   return (
-    <div style={{
+    <aside aria-label="Main Navigation" role="complementary" style={{
       width: 'var(--sidebar-width)',
       height: '100vh',
       position: 'fixed',
@@ -22,12 +22,12 @@ const Sidebar = ({ currentView, setCurrentView }) => {
       display: 'flex',
       flexDirection: 'column'
     }}>
-      <div style={{ marginBottom: '48px', padding: '0 12px' }}>
+      <header role="banner" style={{ marginBottom: '48px', padding: '0 12px' }}>
         <h1 style={{ fontSize: '24px', letterSpacing: '1px' }}>
           <span style={{ color: 'var(--accent-blue)' }}>Stadium</span>Sense
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '4px' }}>AI Predictive Management</p>
-      </div>
+      </header>
 
       <nav style={{ flex: 1 }}>
         {menuItems.map(item => (
@@ -71,7 +71,7 @@ const Sidebar = ({ currentView, setCurrentView }) => {
           Settings
         </button>
       </div>
-    </div>
+    </aside>
   );
 };
 
